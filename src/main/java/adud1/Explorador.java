@@ -19,11 +19,10 @@ public class Explorador {
     public static void main(String[] args) {
         // ejecuta con java Explorador por la terminal !
 
-        // ==================== TODO 2
+        // TODO (2) leer ruta y opción -r; construir raiz con Path.of
 
         String txtRuta = ".";
         boolean recursivo = false;
-       
 
         for (String a : args) // recorre cada objeto de los argumentos introducidos por terminal
         {
@@ -47,7 +46,7 @@ public class Explorador {
             // Path p = Paths.get(arg);
             // explorar(p, p);
         }
-        // ==================== TODO 3
+    // TODO (3) validar: no existe → exit 1; es fichero → una línea y fin
 
         if (!Files.exists(root)) {
             System.out.print("No existe");
@@ -55,13 +54,15 @@ public class Explorador {
             // comprobamos si la ruta existe en el disco
         } else {
             // si existe en el disco comprobamos si es un directorio
+
             if (!Files.isDirectory(root)) {
                 System.out.println(linea(root, root));
+
                 return;
             }
         }
-        // ==================== TODO 4
-    
+       // TODO (4)(6) try-with-resources con Files.list o Files.walk
+
         if (recursivo) {
             try (Stream<Path> hijos = Files.walk(root).skip(1)) {
                 hijos.forEach(hijo -> System.out.println(linea(hijo, root)));
@@ -73,6 +74,7 @@ public class Explorador {
                 codigo = 1;
             } catch (AccessDeniedException e) { // sin permiso para la raíz
                 System.err.println("ERROR: " + e.getMessage());
+                sinAcceso++;
                 codigo = 1;
             } catch (UncheckedIOException e) { // walk falló a mitad: e.getCause()
                 System.err.println("ERROR: " + e.getMessage());
@@ -96,6 +98,7 @@ public class Explorador {
                 codigo = 1;
             } catch (AccessDeniedException e) { // sin permiso para la raíz
                 System.err.println("ERROR: " + e.getMessage());
+                sinAcceso++;
                 codigo = 1;
             } catch (UncheckedIOException e) { // walk falló a mitad: e.getCause()
                 System.err.println("ERROR: " + e.getMessage());
@@ -109,13 +112,20 @@ public class Explorador {
 
         // TODO (7) catch de las excepciones, de la más concreta a la más general
         // TODO (8) imprimir el resumen y System.exit(codigo)
+        System.out.printf("%n%d ficheros · %d directorios · %d bytes · %d sin acceso%n",
+                ficheros, directorios, bytes, sinAcceso);
+        System.exit(codigo);
     }
 
     static String linea(Path p, Path base) {
         // TODO (5) permisos rwx, tamaño y fecha
         String permisos = (Files.isReadable(p) ? "r" : "-") + (Files.isWritable(p) ? "w" : "-")
                 + (Files.isExecutable(p) ? "x" : "-");
-
+        if (Files.isDirectory(p)) {
+            directorios++;
+        } else {
+            ficheros++;
+        }
         long sizeLong;
         String sizeString = "";
 
@@ -126,44 +136,45 @@ public class Explorador {
         try {
             sizeLong = Files.size(p);
             sizeString = Long.toString(sizeLong);
+            bytes += sizeLong;
         } catch (NoSuchFileException e) { // la ruta desapareció
-               sizeString = "ERROR: " + e.getMessage();
-                codigo = 1;
-            } catch (NotDirectoryException e) { // no se puede listar un fichero
-               sizeString = "ERROR: " + e.getMessage();
-                codigo = 1;
-            } catch (AccessDeniedException e) { // sin permiso para la raíz
-               sizeString ="ERROR: " + e.getMessage();
-                codigo = 1;
-            } catch (UncheckedIOException e) { // walk falló a mitad: e.getCause()
-               sizeString = "ERROR: " + e.getMessage();
-                codigo = 1;
-            } catch (IOException e) { // cualquier otro fallo de E/S
-                sizeString ="ERROR: " + e.getMessage();
-                codigo = 1;
-            }
+            sizeString = "ERROR: " + e.getMessage();
+            codigo = 1;
+        } catch (NotDirectoryException e) { // no se puede listar un fichero
+            sizeString = "ERROR: " + e.getMessage();
+            codigo = 1;
+        } catch (AccessDeniedException e) { // sin permiso para la raíz
+            sizeString = "ERROR: " + e.getMessage();
+            sinAcceso++;
+            codigo = 1;
+        } catch (UncheckedIOException e) { // walk falló a mitad: e.getCause()
+            sizeString = "ERROR: " + e.getMessage();
+            codigo = 1;
+        } catch (IOException e) { // cualquier otro fallo de E/S
+            sizeString = "ERROR: " + e.getMessage();
+            codigo = 1;
+        }
 
         try {
             timeNoFormat = Files.getLastModifiedTime(p);
             aux = timeNoFormat.toInstant();
             time = FECHA.format(aux);
-        }  catch (NoSuchFileException e) { // la ruta desapareció
-               time = "ERROR: " + e.getMessage();
-                codigo = 1;
-            } catch (NotDirectoryException e) { // no se puede listar un fichero
-               time = "ERROR: " + e.getMessage();
-                codigo = 1;
-            } catch (AccessDeniedException e) { // sin permiso para la raíz
-               time ="ERROR: " + e.getMessage();
-                codigo = 1;
-            } catch (UncheckedIOException e) { // walk falló a mitad: e.getCause()
-               time = "ERROR: " + e.getMessage();
-                codigo = 1;
-            } catch (IOException e) { // cualquier otro fallo de E/S
-                time ="ERROR: " + e.getMessage();
-                codigo = 1;
-            }
-
+        } catch (NoSuchFileException e) { // la ruta desapareció
+            time = "ERROR: " + e.getMessage();
+            codigo = 1;
+        } catch (NotDirectoryException e) { // no se puede listar un fichero
+            time = "ERROR: " + e.getMessage();
+            codigo = 1;
+        } catch (AccessDeniedException e) { // sin permiso para la raíz
+            time = "ERROR: " + e.getMessage();
+            codigo = 1;
+        } catch (UncheckedIOException e) { // walk falló a mitad: e.getCause()
+            time = "ERROR: " + e.getMessage();
+            codigo = 1;
+        } catch (IOException e) { // cualquier otro fallo de E/S
+            time = "ERROR: " + e.getMessage();
+            codigo = 1;
+        }
 
         // TODO (6) sangría según el nivel respecto a base
         int nivel = base.relativize(p).getNameCount();
