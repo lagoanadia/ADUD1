@@ -40,7 +40,7 @@ public class Explorador {
         // convertimos el string ya identificado como nuestra ruta en un objeto Path
         // toAbsolutePath completa la ruta desde la raiz del disco es decir añade C:\
         // el metodo normalize elimina . .. para obtener la ruta completa limpia
-        System.out.println(root);
+        System.out.println("Explorando " + root);
 
         {
             // Path p = Paths.get(arg);
@@ -121,7 +121,8 @@ public class Explorador {
         // TODO (5) permisos rwx, tamaño y fecha
         String permisos = (Files.isReadable(p) ? "r" : "-") + (Files.isWritable(p) ? "w" : "-")
                 + (Files.isExecutable(p) ? "x" : "-");
-        if (Files.isDirectory(p)) {
+        boolean esDirectorio = Files.isDirectory(p);
+        if (esDirectorio) {
             directorios++;
         } else {
             ficheros++;
@@ -181,7 +182,8 @@ public class Explorador {
         String sangria = " ".repeat(nivel - 1);
 
         // TODO (7) si falla la lectura de atributos, devolver la ruta con el motivo
-        String datos = sangria + permisos + " " + sizeString + " bytes " + time + " " + p.getFileName();
+        String nombre = p.getFileName() + (esDirectorio ? "/" : "");
+        String datos = String.format("%s%-15s %5s  %s  %s", sangria, permisos, sizeString, time, nombre);
         return datos;
     }
 }

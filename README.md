@@ -96,4 +96,6 @@ Muestra solo la línea de ese fichero y termina, sin intentar listar nada más.
 
 ## Nivel de IA
 
-IA-1: la IA (Claude) explicó los conceptos de la teoría (`Path`, `Files`, excepciones comprobadas/no comprobadas, `try-with-resources`) y señaló errores de compilación/lógica con preguntas guía, pero no escribió el código de la solución.
+IA-1: la IA (Claude) explicó los conceptos de la teoría (`Path`, `Files`, excepciones comprobadas/no comprobadas, `try-with-resources`) y señaló errores de compilación/lógica con preguntas guía, pero no escribió el código de la solución (`Explorador.java`), que es autoría propia.
+
+Este fichero `README.md` (la redacción, no el código ni las pruebas) sí lo ha escrito Claude a partir de las pruebas y decisiones ya tomadas en la conversación.
