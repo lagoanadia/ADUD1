@@ -27,7 +27,6 @@ public class Explorador {
         for (String a : args) // recorre cada objeto de los argumentos introducidos por terminal
         {
             if (a.equals("-r")) {
-                System.out.print("Recursivo SI    ");
                 recursivo = true;
                 // flag por si encuentra "-r" por ejemplo: java Explorador -r
             } else {
@@ -42,10 +41,6 @@ public class Explorador {
         // el metodo normalize elimina . .. para obtener la ruta completa limpia
         System.out.println("Explorando " + root);
 
-        {
-            // Path p = Paths.get(arg);
-            // explorar(p, p);
-        }
     // TODO (3) validar: no existe → exit 1; es fichero → una línea y fin
 
         if (!Files.exists(root)) {
@@ -64,7 +59,7 @@ public class Explorador {
        // TODO (4)(6) try-with-resources con Files.list o Files.walk
 
         if (recursivo) {
-            try (Stream<Path> hijos = Files.walk(root).skip(1)) {
+            try (Stream<Path> hijos = Files.walk(root).sorted().skip(1)) {
                 hijos.forEach(hijo -> System.out.println(linea(hijo, root)));
             } catch (NoSuchFileException e) { // la ruta desapareció
                 System.err.println("ERROR: " + e.getMessage());
