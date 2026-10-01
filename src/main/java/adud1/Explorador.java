@@ -9,6 +9,20 @@ import java.time.format.DateTimeFormatter;
 import java.util.stream.Stream;
 import java.time.Instant;
 
+/**
+ * Explorador de directorios por línea de comandos basado en {@code java.nio.file}.
+ * <p>
+ * Recorre la ruta indicada por argumentos, mostrando para cada elemento sus
+ * permisos ({@code rwx}), tamaño en bytes, fecha de última modificación y
+ * nombre. Por defecto solo lista un nivel; con el modificador {@code -r}
+ * recorre el árbol completo de forma recursiva, con sangría creciente según
+ * la profundidad.
+ * <p>
+ * Un fallo de acceso en un elemento concreto (por ejemplo,
+ * {@link java.nio.file.AccessDeniedException}) se trata donde ocurre y no
+ * detiene el recorrido: se cuenta en el resumen final y se sigue con el
+ * resto de elementos.
+ */
 public class Explorador {
     private static final DateTimeFormatter FECHA = DateTimeFormatter
             .ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.systemDefault());
@@ -16,6 +30,20 @@ public class Explorador {
     private static long bytes; // (8)
     private static int codigo = 0;
 
+    /**
+     * Punto de entrada del programa.
+     * <p>
+     * Interpreta los argumentos de la línea de comandos (una ruta opcional y
+     * el modificador {@code -r}), valida que la ruta exista, y lanza el
+     * listado de un nivel o el recorrido recursivo según corresponda.
+     * Termina imprimiendo un resumen con el número de ficheros, directorios,
+     * bytes totales y elementos sin acceso.
+     *
+     * @param args argumentos de la línea de comandos: una ruta (si se omite,
+     *             se usa el directorio actual) y, opcionalmente, {@code -r}
+     *             para recorrer el árbol de forma recursiva. El orden entre
+     *             ambos no importa.
+     */
     public static void main(String[] args) {
         // ejecuta con java Explorador por la terminal !
 
@@ -112,6 +140,24 @@ public class Explorador {
         System.exit(codigo);
     }
 
+    /**
+     * Construye la línea de salida de un elemento del árbol: permisos,
+     * tamaño, fecha de última modificación y nombre, con sangría según la
+     * profundidad respecto a {@code base}.
+     * <p>
+     * Incrementa los contadores estáticos del resumen final
+     * ({@code ficheros}/{@code directorios}/{@code bytes}/{@code sinAcceso})
+     * según corresponda. Si falla la lectura del tamaño o de la fecha, el
+     * fallo se captura aquí mismo (no se propaga, porque este método se
+     * invoca desde dentro de un {@code forEach}, que no admite excepciones
+     * comprobadas) y se muestra el motivo en lugar del dato que no se pudo
+     * leer.
+     *
+     * @param p    la ruta del elemento a describir.
+     * @param base la raíz desde la que se está explorando, usada para
+     *             calcular el nivel de profundidad y, por tanto, la sangría.
+     * @return la línea formateada lista para imprimir.
+     */
     static String linea(Path p, Path base) {
         // TODO (5) permisos rwx, tamaño y fecha
         String permisos = (Files.isReadable(p) ? "r" : "-") + (Files.isWritable(p) ? "w" : "-")
