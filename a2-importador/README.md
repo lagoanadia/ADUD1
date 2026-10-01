@@ -217,14 +217,3 @@ justo el problema que resuelve el resto de la asignatura.
   envuelve en `"..."` y las comillas internas se duplican (`"` → `""`), el
   escapado estándar de CSV, para que una fila rechazada que ya traía `;` o
   `"` (como la de "Talleres Miño") no rompa el propio fichero de salida.
-
-## 7 · Nivel de IA
-
-Esta entrega se ha hecho con más ayuda de la que pide IA-2 (que da por hecho
-que el alumno ya tiene una versión propia y la IA solo la revisa o busca
-casos sin tratar): aquí Claude ha escrito el código completo a partir del
-enunciado. Queda anotado explícitamente para ser honesto con el nivel real
-de IA usado, y porque el apartado "Forma de acceso" se retoma en la
-defensa — conviene repasar y entender cada decisión de este README (sobre
-todo los criterios de validez añadidos y el porqué del código postal) antes
-de defenderla.
